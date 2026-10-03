@@ -130,6 +130,8 @@ interface StraightPoolMove {
  */
 interface ScoreResponse {
   scoreA: number, scoreB: number
+  /** Wer nach diesem Stand anstößt — leer, solange kein Erstanstoß feststeht. */
+  nextBreak?: string | null
   ballsOnTable?: number | null, foulsA?: number | null, foulsB?: number | null
   runA?: number | null, highA?: number | null
   runB?: number | null, highB?: number | null
@@ -1677,6 +1679,26 @@ export function useScoring(optionen: {
         // Wiederholung nach einem Netzausfall.
         pendingCleanup()
         held.value = { score: { A: response.scoreA, B: response.scoreB }, since: Date.now() }
+        /*
+         * DER ANSTOSS AUS DERSELBEN ANTWORT — SEIT DEM 03.10.2026.
+         *
+         * Die Anwendung rechnet ihn bei jedem Stand neu (`break_after`) und
+         * nennt ihn in der Antwort; gelesen wurde er hier nicht. Bei
+         * Satzwertung sprang der Balken deshalb erst mit dem nächsten
+         * Zehn-Sekunden-Abruf um — bis zu zehn Sekunden, in denen die Tafel
+         * nach dem Rack noch den alten Anstoß zeigte, obwohl der Stand längst
+         * angekommen war.
+         *
+         * Nur wenn die Antwort zum JÜNGSTEN Tipp gehört (`optimistic` steht
+         * hier noch auf ihm, siehe `send`): eine überholte Antwort trüge
+         * den Anstoß eines Standes, den es nicht mehr gibt.
+         */
+        const latest = optimistic.value
+        const nb = response.nextBreak
+        if ((nb === 'A' || nb === 'B') && breakState.value.first
+          && (!latest || (latest.A === response.scoreA && latest.B === response.scoreB))) {
+          breakOptimistic.value = { first: breakState.value.first, next: nb, since: Date.now() }
+        }
         // Dieselbe Regel für die Lage — und nur, wenn die Antwort sie führt.
         // Eine Satzpartie bekommt hier nichts zurück und soll auch nichts
         // festhalten.
