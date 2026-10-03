@@ -238,12 +238,86 @@ async function choose(number: number) {
   // Derselbe Tisch zweimal: der zweite Druck ist die Ungeduld, nicht die
   // Absicht. Ein anderer Tisch geht durch -- siehe oben.
   if (opening.value === number) return
+
+  /*
+   * EIN WECHSEL EINER GEBUNDENEN FREIGABE FRAGT NACH DEM CODE -- SEIT DEM
+   * 03.10.2026.
+   *
+   * Hält dieses Gerät schon eine Freigabe, und sie hängt an einem ANDEREN
+   * Tisch, geht es nicht ohne den Tafelcode der Veranstaltung weiter: der
+   * Server verlangt ihn, und diese Seite fragt danach, statt den Wechsel
+   * still abzuschicken und abweisen zu lassen. Ohne Freigabe, mit einer
+   * Freigabe ohne Tisch (der Code wurde gerade eingegeben) und beim
+   * selben Tisch bleibt alles wie es war.
+   */
+  if (needsCode(number)) {
+    await openMove(number)
+    return
+  }
+
+  await go(number)
+}
+
+/** Verlangt dieser Wechsel den Tafelcode? Das Gegenstück steht im Backend. */
+function needsCode(number: number): boolean {
+  return grant.value?.released === true
+    && grant.value.tableNumber !== null
+    && grant.value.tableNumber !== number
+}
+
+/**
+ * Den Tisch öffnen -- und die Freigabe mitnehmen, wenn es noch nötig ist.
+ *
+ * `moved` heisst: der Wechsel ist schon geschehen (mit Code, im Dialog), die
+ * Freigabe muss nicht noch einmal gefragt werden.
+ */
+async function go(number: number, moved = false) {
   opening.value = number
 
   // Der Vorschlag hat sich erledigt, sobald gewählt ist — auch dann, wenn
   // ein ANDERER Tisch gewählt wurde. Sonst stünde das Band noch da, während
   // die Kachel daneben schon lädt.
   suggestion.value = null
+
+  /*
+   * DIE FREIGABE ZIEHT MIT UM -- AUCH OHNE CODE, ABER NUR BIS ZUM ERSTEN
+   * TISCH.
+   *
+   * Sie gilt für EINEN Tisch — das ist ihr Sinn, und ohne diesen Aufruf
+   * bliebe sie an dem Tisch stehen, an dem sie eingelöst wurde. Ohne Code
+   * geht das nur noch an zwei Stellen: die ERSTE Wahl einer Freigabe, die
+   * noch an keinem Tisch hängt (der Code wurde beim Einlösen gerade
+   * eingegeben), und die Wahl desselben Tisches. Ein Schirm, den jemand
+   * einen Tisch weiterrollt, braucht seit dem 03.10.2026 den Tafelcode
+   * wieder — davor ging das ohne jede Prüfung, und wer die Tischwahl kannte
+   * (zweimal Taste 0, oder /board/<eventId> in der Adresszeile), zählte an
+   * fremden Tischen. Dieser Fall läuft über den Dialog unten und kommt hier
+   * nur mit `moved` an.
+   *
+   * Der Fehler wird sonst verschluckt und die Wahl geht trotzdem durch: die
+   * Tischwahl ist der Weg zur ANZEIGE, und die darf jeder sehen. Ob auch
+   * gezählt werden kann, sagt die Tafel selbst — sie fragt beim ersten
+   * Abruf nach und zeigt ohne Freigabe eben keine Bedienflächen.
+   *
+   * EINE AUSNAHME: antwortet der Server BOARD_CODE_REQUIRED, hing die
+   * Freigabe doch an einem anderen Tisch, als diese Seite wusste (zweites
+   * Fenster, alter Stand). Dann wird nicht navigiert, sondern gefragt --
+   * sonst stünde der Schirm an einem Tisch, an dem jede Fläche abgewiesen
+   * würde.
+   */
+  if (!moved && grant.value?.released) {
+    const word = await $fetch('/api/board/grant/table', {
+      method: 'PUT',
+      body: { tableNumber: number },
+    }).then(() => undefined, (error: unknown) => errorWord(error))
+    if (word === 'BOARD_CODE_REQUIRED') {
+      opening.value = null
+      await fetchGrant()
+      await openMove(number)
+      return
+    }
+  }
+
   rememberLast(number)
 
   try {
@@ -256,27 +330,6 @@ async function choose(number: number) {
      * Fehlermeldung an dieser Stelle hielte den Schirm von dem ab, was er
      * eigentlich soll.
      */
-  }
-
-  /*
-   * DIE FREIGABE ZIEHT MIT UM.
-   *
-   * Sie gilt für EINEN Tisch — das ist ihr Sinn, und ohne diesen Aufruf
-   * bliebe sie an dem Tisch stehen, an dem sie eingelöst wurde. Ein Schirm,
-   * den jemand einen Tisch weiterrollt, zeigte dann Tisch 7 an und dürfte
-   * weiter nur an Tisch 3 zählen; die Flächen wären da und jede einzelne
-   * würde abgewiesen.
-   *
-   * Der Fehler wird verschluckt und die Wahl geht trotzdem durch: die
-   * Tischwahl ist der Weg zur ANZEIGE, und die darf jeder sehen. Ob auch
-   * gezählt werden kann, sagt die Tafel selbst — sie fragt beim ersten
-   * Abruf nach und zeigt ohne Freigabe eben keine Bedienflächen.
-   */
-  if (grant.value?.released) {
-    await $fetch('/api/board/grant/table', {
-      method: 'PUT',
-      body: { tableNumber: number },
-    }).catch(() => undefined)
   }
 
   navigateTo(`/board/${eventId}/${number}`)
@@ -315,6 +368,22 @@ function move(d: number) {
 }
 
 function onKey(ev: KeyboardEvent) {
+  /*
+   * IM DIALOG GREIFT DIE FERNBEDIENUNG NICHT IN DIE TISCHWAHL DURCH.
+   *
+   * Solange der Tafelcode für einen Wechsel erfragt wird, gehört jede Taste
+   * dem Dialog: eine Ziffer, die neben das Feld fiele, wählte sonst einen
+   * Tisch, und Enter auf einem Knopf des Dialogs wählte ihn gleich mit.
+   * Escape schliesst.
+   */
+  if (moveTarget.value !== null) {
+    if (ev.key === 'Escape') {
+      cancelMove()
+      ev.preventDefault()
+    }
+    return
+  }
+
   /*
    * Nicht, während jemand tippt. Der Grund stand hier am Anmeldeformular
    * (jede Ziffer eines Kennworts landete in der Tischwahl und wurde mit
@@ -613,11 +682,19 @@ async function fetchGrant() {
 /**
  * Sechs Ziffern einlösen.
  *
- * OHNE Tischnummer: gewählt wird der Tisch danach, oben in der Liste, und
- * zwar mit demselben Griff, mit dem ein Schirm später den Tisch wechselt.
- * Beides in einem Schritt zu verlangen hiesse, dass jeder Tischwechsel den
- * Code wieder braucht — und der liegt dann beim Turnierleiter, nicht am
- * Gerät.
+ * OHNE Tischnummer: gewählt wird der Tisch danach, oben in der Liste. Die
+ * erste Wahl braucht keinen Code mehr (er wurde hier gerade eingegeben);
+ * Einlösen und erste Tischwahl sind zwei Griffe, damit ein Gerät ohne
+ * Tisch überhaupt entstehen kann -- die eine Adresse für alle Schirme
+ * führt erst auf die Tischwahl.
+ *
+ * Seit dem 03.10.2026 gilt NICHT mehr, dass jeder spätere Tischwechsel ohne
+ * Code geht: eine Freigabe, die schon an einem Tisch hängt, verlangt den
+ * Code beim Wechsel erneut (siehe `choose` und den Dialog darunter). Der
+ * frühere Satz an dieser Stelle -- "Beides in einem Schritt zu verlangen
+ * hiesse, dass jeder Tischwechsel den Code wieder braucht" -- war der Grund
+ * für die Lücke: ein Gerät mit einer Freigabe für Tisch X wechselte ohne
+ * jede Prüfung auf Tisch Y und zählte dort.
  *
  * DIE AUSKÜNFTE WERDEN UNTERSCHIEDEN
  *
@@ -662,7 +739,7 @@ function codeText(code: string | undefined): string {
       // Hier stand "locked for a quarter of an hour", und das war richtig,
       // solange jede Sperre gleich lang war. Seit die Sperre mit jedem
       // Zyklus waechst (15, 30, 60 Minuten ... bis 24 Stunden, siehe
-      // identity.redeem_board_code), waere die Viertelstunde bei der
+      // identity.check_board_code), waere die Viertelstunde bei der
       // zweiten Sperre eine Zusage, die niemand einhaelt -- und wer nach
       // fuenfzehn Minuten wiederkommt und wieder abgewiesen wird, haelt
       // die Tafel fuer kaputt.
@@ -676,6 +753,10 @@ function codeText(code: string | undefined): string {
         + 'until one day after.'
     case 'UNKNOWN_TABLE':
       return 'That table does not belong to this event.'
+    case 'BOARD_CODE_REQUIRED':
+      // Seit dem 03.10.2026: ein Wechsel an einen anderen Tisch braucht den
+      // Tafelcode, und der Server hat keinen bekommen.
+      return 'Moving this screen to another table needs the board code of this event.'
     case 'TOO_MANY_DEVICES':
       // Seit dem 25.09.2026: der Code war richtig, nur der Deckel auf
       // gleichzeitig aktive Geraete dieser Veranstaltung ist erreicht.
@@ -687,6 +768,85 @@ function codeText(code: string | undefined): string {
     default:
       return 'That code was not accepted.'
   }
+}
+
+/** Das Wort einer abgewiesenen Anfrage -- `error` des Backends, oder undefined. */
+function errorWord(error: unknown): string | undefined {
+  return (error as { data?: { data?: { error?: string } } })?.data?.data?.error
+    ?? (error as { data?: { error?: string } })?.data?.error
+}
+
+/* ------------------------------------------------------------------------
+ * DER WECHSEL AN EINEN ANDEREN TISCH -- MIT TAFELCODE
+ *
+ * Seit dem 03.10.2026. Eine Freigabe, die schon an einem Tisch hängt,
+ * wechselt nur noch mit dem sechsstelligen Tafelcode der Veranstaltung --
+ * demselben, der beim Einlösen eingegeben wird. Ohne ihn bliebe die
+ * Tischwahl eine Tür in jeden fremden Tisch, und sie ist für jeden
+ * erreichbar, der /board/<eventId> aufruft.
+ *
+ * DIE FEHLVERSUCHE ZÄHLEN IN DIE BREMSE DES EINLÖSENS. Fünf falsche Codes
+ * hier sperren dasselbe Konto wie fünf am Einrichtungsschirm; der Dialog
+ * leert das Feld nach jedem Fehlversuch, damit niemand den alten Code
+ * stehen lässt und ihn mit Enter noch einmal losschickt.
+ * --------------------------------------------------------------------- */
+const moveTarget = ref<number | null>(null)
+const moveDigits = ref('')
+const moveError = ref('')
+const moving = ref(false)
+const moveInput = ref<HTMLInputElement | null>(null)
+
+const moveComplete = computed(() => /^[0-9]{6}$/.test(moveDigits.value))
+
+async function openMove(number: number) {
+  moveTarget.value = number
+  moveDigits.value = ''
+  moveError.value = ''
+  // Wie beim Einlösefeld: das Feld nimmt den Schreibzeiger selbst, aber erst,
+  // wenn es im Dokument steht.
+  await nextTick()
+  moveInput.value?.focus()
+}
+
+/** Zu: kein Wechsel, kein Navigieren -- die Freigabe bleibt, wo sie ist. */
+function cancelMove() {
+  moveTarget.value = null
+  moveDigits.value = ''
+  moveError.value = ''
+  opening.value = null
+}
+
+async function submitMove() {
+  const number = moveTarget.value
+  if (number === null || !moveComplete.value || moving.value) return
+  moving.value = true
+  moveError.value = ''
+  let moved = false
+  try {
+    await $fetch('/api/board/grant/table', {
+      method: 'PUT',
+      body: { tableNumber: number, code: moveDigits.value },
+    })
+    moved = true
+  }
+  catch (error: unknown) {
+    moveError.value = codeText(errorWord(error))
+    moveDigits.value = ''
+  }
+  finally {
+    moving.value = false
+  }
+
+  if (moved) {
+    moveDigits.value = ''
+    moveTarget.value = null
+    await fetchGrant()
+    await go(number, true)
+    return
+  }
+  // Der Dialog bleibt offen; das Feld ist leer und will wieder tippen.
+  await nextTick()
+  moveInput.value?.focus()
 }
 
 /**
@@ -1020,6 +1180,47 @@ useHead({
           The choice is remembered · press 0 for another event
         </span>
       </footer>
+
+      <!--
+        DER TAFELCODE FÜR EINEN WECHSEL (seit dem 03.10.2026).
+
+        Über allem und mit eigenem Hintergrund: solange er offen ist, gehört
+        jede Eingabe ihm (siehe `onKey`). Felder und Knöpfe sind dieselben wie
+        im Einlösefeld darunter -- eine zweite Gestaltung für dieselben sechs
+        Ziffern gäbe es nur, damit jemand sie nicht wiedererkennt.
+      -->
+      <div
+        v-if="moveTarget !== null" class="wechsel" role="dialog" aria-modal="true"
+        aria-labelledby="wechsel-titel"
+      >
+        <div class="wechsel__box">
+          <h2 id="wechsel-titel" class="wechsel__titel">
+            Move input to table {{ moveTarget }}?
+          </h2>
+          <p class="wechsel__text">
+            This screen is released for table {{ grant?.tableNumber }}. Moving it to
+            table {{ moveTarget }} needs the six digit board code of this event.
+          </p>
+          <form class="zaehlen__form" @submit.prevent="submitMove">
+            <input
+              ref="moveInput"
+              v-model="moveDigits" class="zaehlen__code"
+              inputmode="numeric" autocomplete="off" maxlength="6"
+              placeholder="······" aria-label="Board code" required
+            >
+            <button
+              type="submit" class="zaehlen__knopf zaehlen__knopf--an"
+              :disabled="moving || !moveComplete"
+            >
+              {{ moving ? 'Moving …' : 'Move' }}
+            </button>
+            <button type="button" class="zaehlen__knopf" @click="cancelMove">
+              Cancel
+            </button>
+            <p v-if="moveError" class="zaehlen__fehler" role="alert">{{ moveError }}</p>
+          </form>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -1421,6 +1622,41 @@ useHead({
   color: var(--color-danger, #ff5252);
   font-weight: 700;
   text-transform: uppercase;
+}
+
+/*
+ * DER DIALOG FÜR DEN TISCHWECHSEL
+ *
+ * Nur die Hülle: ein abgedunkelter Grund und ein Kasten in den Farben der
+ * Seite. Was darin steht, sind die Klassen der Einrichtungszeile.
+ */
+.wechsel {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(5, 8, 13, 0.9);
+}
+
+.wechsel__box {
+  width: min(92vw, 60rem);
+  padding: 3dvh 4dvh;
+  border: 2px solid var(--accent);
+  border-radius: 0.6rem;
+  background: var(--ground);
+  font-size: min(2.4dvh, 2.6vw);
+}
+
+.wechsel__titel {
+  margin: 0 0 1dvh;
+  font-size: min(4.2dvh, 4.8vw);
+  font-weight: 700;
+}
+
+.wechsel__text {
+  margin: 0 0 2dvh;
+  color: var(--ink-dim);
 }
 
 .pick__foot {

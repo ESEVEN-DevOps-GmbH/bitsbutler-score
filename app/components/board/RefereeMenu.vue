@@ -1094,75 +1094,41 @@ async function cardGive(person: CardStanding, reason: CardReason, code: string) 
 }
 
 /* ------------------------------------------------------------------------
- * DER TISCHWECHSEL — SEIT DEM 16.09.2026 EBENFALLS HINTER DEN SECHS ZIFFERN
+ * DER TISCHWECHSEL — SEIT DEM 03.10.2026 OHNE PERSONENCODE, ABER HINTER DEM
+ * TAFELCODE
  *
- * Hier stand: "Ohne Code — ein Tischwechsel nimmt nichts fest und verkürzt
- * nichts." Das stimmt für den Vorgang und beantwortet die falsche Frage. Der
- * Auftraggeber verlangt die PIN für "im endeffekt alles was dort im menue
- * drin ist", und der Fall, den er meint, ist nicht der Aufbau am Morgen,
- * sondern der Schirm, der MITTEN IN EINER PARTIE seine Partie verlässt: für
- * den Saal ist die Tafel dann weg, und für den Schiedsrichter die Bedienung.
+ * Vom 16.09. bis zum 03.10.2026 verlangte dieser Punkt die sechs Ziffern
+ * eines Menschen (`POST /api/board/grant/pin`). Das sicherte nur den Weg ins
+ * Menü und nicht das Ziel: auf die Tischwahl kam man auch ohne ihn — mit
+ * zweimal 0 an einem Tisch ohne Partie oder über `/board/{eventId}` in der
+ * Adresszeile —, und dort zog die Freigabe ohne jede Prüfung an jeden
+ * anderen Tisch mit. Ein Gerät mit einer Freigabe für Tisch X zählte so an
+ * Tisch Y.
  *
- * DER AUFBAU IST DAVON NICHT BETROFFEN, und das ist der Grund, aus dem die
- * Änderung tragbar ist. Einen Tisch SETZT man nicht hier, sondern auf der
- * Einrichtungsseite `/board/{eventId}`: dort wird der sechsstellige Code
- * eingelöst und der Tisch gewählt, und dieser Weg bleibt ohne Personencode
- * (`PUT /board/grant/table` verlangt nur eine gültige Freigabe). Wer am
- * Morgen zwanzig Geräte aufstellt, braucht also weiterhin nur den Zettel mit
- * den sechs Ziffern. Die PIN trifft genau den Wechsel aus einer laufenden
- * Partie heraus — und das ist der Fall, um den es geht.
+ * WAS JETZT GILT. Der Riegel liegt am Server, an `PUT /board/grant/table`:
+ * die erste Tischwahl einer Freigabe ohne Tisch und die Wahl desselben
+ * Tisches gehen ohne Code, jeder Wechsel einer Freigabe, die schon an einem
+ * Tisch hängt, verlangt den sechsstelligen TAFELCODE der Veranstaltung —
+ * mit derselben Bremse wie beim Einlösen. Der hält auch den, der dieses
+ * Menü gar nicht benutzt.
  *
- * WAS SIE NICHT IST: eine Sperre. Wer die Adresse kennt, tippt
- * `/board/{eventId}` in die Zeile und ist auch dort. Das ist dieselbe Art
- * Schutz wie der Rahmengriff, der das Menü öffnet — er hält das, was
- * BEILÄUFIG passiert, und das ist hier alles, was zu halten ist.
- *
- * GEPRÜFT WIRD AM SERVER UND NICHT IM GERÄT. Der Tischwechsel ist der
- * einzige Punkt dieses Menüs, der nichts schreibt; ein Code, der nur hier
- * verglichen würde, wäre eine Behauptung des Geräts über sich selbst — und
- * genau die hat der Bau vom 15.09.2026 überall sonst abgeschafft. Deshalb
- * `POST /api/board/grant/pin`: er löst die sechs Ziffern in der Verwaltung
- * auf, hängt an derselben Bremse wie jeder andere Codeweg und gibt den Namen
- * zurück.
+ * DIE PIN HIER FÄLLT DESHALB WEG. Der Auftraggeber am 03.10.2026: „Menü ohne
+ * PIN, Tafelcode reicht". Mit ihr wären es zwei Codes hintereinander
+ * gewesen, und der erste hätte nichts gesichert, was der zweite nicht
+ * ohnehin sichert. Die RÜCKFRAGE bleibt: sie hält das, was beiläufig
+ * passiert — ein Griff an den Rahmen soll den Schirm nicht aus einem
+ * laufenden Halbfinale werfen.
  * --------------------------------------------------------------------- */
 function tableSwitchAsk() {
   ask({
     question: 'Move this screen to another table?',
     explanation: 'The match below stays as it is. This screen goes back to the '
-      + 'table list and will show whatever is playing at the table you pick.',
+      + 'table list and will show whatever is playing at the table you pick. '
+      + 'Moving the input to another table needs the board code.',
     word: 'Change table',
-    // Dieselbe Regel wie bei der Karte und der Aufgabe: nur am
-    // freigeschalteten Gerät ohne Menschen dahinter.
-    code: !props.asHuman,
-    act: (code: string) => void tableSwitchAct(code),
+    code: false,
+    act: () => emit('tableSwitch'),
   })
-}
-
-/**
- * Erst den Code nachweisen, dann gehen.
- *
- * Ohne Code (ausgewiesener Mensch) geht es sofort — dann hat der Server
- * schon gesagt, dass hier ein Mensch handelt, und eine Anfrage, die nur
- * "ja" sagen kann, ist ein Umlauf ohne Auskunft.
- *
- * Scheitert der Nachweis, BLEIBT DAS MENÜ OFFEN und die rote Zeile sagt,
- * warum. Der Schirm auf die Tischwahl zu schicken und DORT abzuweisen wäre
- * die schlechtere Reihenfolge: dann stünde die Partie nicht mehr da, über
- * die gerade entschieden wird.
- */
-async function tableSwitchAct(code: string) {
-  if (code === '') {
-    emit('tableSwitch')
-    return
-  }
-  own.report(null)
-  try {
-    await $fetch('/api/board/grant/pin', { method: 'POST', body: { pin: code } })
-    emit('tableSwitch')
-  }
-  catch (raw: unknown) {
-    own.reject(raw)
-  }
 }
 
 /* ------------------------------------------------------------------------
