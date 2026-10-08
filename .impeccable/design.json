@@ -1,0 +1,388 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T20:21:50+00:00",
+  "title": "Design System: BitsButler Tafel",
+  "extensions": {
+    "colorMeta": {
+      "house-accent": {
+        "role": "primary",
+        "displayName": "Hausakzent (Rückfall)",
+        "tonalRamp": [
+          "#00384c",
+          "#005e80",
+          "#0083b2",
+          "#00a9e6",
+          "#33c9ff",
+          "#70d9ff",
+          "#ade9ff",
+          "#e5f8ff"
+        ],
+        "cssVariable": "--accent → var(--color-primary, #00afee)"
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "Schrift auf Akzent",
+        "tonalRamp": [
+          "#00374c",
+          "#005c80",
+          "#0081b2",
+          "#00a6e6",
+          "#33c7ff",
+          "#70d8ff",
+          "#ade8ff",
+          "#e5f8ff"
+        ]
+      },
+      "ground": {
+        "role": "neutral",
+        "displayName": "Saalgrund",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      },
+      "key": {
+        "role": "neutral",
+        "displayName": "Tastenfläche",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Linie",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Schrift",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      },
+      "ink-dim": {
+        "role": "neutral",
+        "displayName": "Schrift, gedämpft",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      },
+      "shotclock": {
+        "role": "secondary",
+        "displayName": "Shot-Clock",
+        "tonalRamp": [
+          "#4c3600",
+          "#805900",
+          "#b27d00",
+          "#e6a100",
+          "#ffc233",
+          "#ffd470",
+          "#ffe7ad",
+          "#fff7e5"
+        ]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Abschluss",
+        "tonalRamp": [
+          "#0f3d27",
+          "#1a6641",
+          "#248f5b",
+          "#2eb775",
+          "#5cd69b",
+          "#8de2b9",
+          "#beefd7",
+          "#ebfaf2"
+        ]
+      },
+      "on-success": {
+        "role": "secondary",
+        "displayName": "Schrift auf Abschluss",
+        "tonalRamp": [
+          "#08451d",
+          "#0d7330",
+          "#12a143",
+          "#17cf56",
+          "#47eb80",
+          "#7ef1a6",
+          "#b6f7cc",
+          "#e8fcef"
+        ]
+      },
+      "danger": {
+        "role": "secondary",
+        "displayName": "Gefahr",
+        "tonalRamp": [
+          "#4c0000",
+          "#800000",
+          "#b20000",
+          "#e60000",
+          "#ff3333",
+          "#ff7070",
+          "#ffadad",
+          "#ffe5e5"
+        ]
+      },
+      "on-danger": {
+        "role": "secondary",
+        "displayName": "Schrift auf Gefahr",
+        "tonalRamp": [
+          "#4c0000",
+          "#800000",
+          "#b20000",
+          "#e60000",
+          "#ff3333",
+          "#ff7070",
+          "#ffadad",
+          "#ffe5e5"
+        ]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Hinweis",
+        "tonalRamp": [
+          "#4b2101",
+          "#7e3602",
+          "#b04c03",
+          "#e26203",
+          "#fc8a36",
+          "#fdad72",
+          "#fed0af",
+          "#fff0e6"
+        ]
+      },
+      "sponsor-plate": {
+        "role": "neutral",
+        "displayName": "Sponsorentafel",
+        "tonalRamp": [
+          "#05080d",
+          "#0b1220",
+          "#1b2432",
+          "#2c3a4f",
+          "#5b6b80",
+          "#93a1b3",
+          "#c9d2dd",
+          "#ffffff"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "score": {
+        "displayName": "Stand",
+        "purpose": "Größtes Element des Bildes; Größe je Spalte errechnet."
+      },
+      "table-sign": {
+        "displayName": "Tischschild",
+        "purpose": "Tischnummer in der Mitte, Hausakzent."
+      },
+      "surname": {
+        "displayName": "Nachname",
+        "purpose": "Versalien, 800 (gerendert 900)."
+      },
+      "given-name": {
+        "displayName": "Vorname",
+        "purpose": "Gedämpft, einzige Stelle ohne Versalien (500, gerendert 600)."
+      },
+      "head": {
+        "displayName": "Kopf",
+        "purpose": "Wappen/Veranstalter."
+      },
+      "key-word": {
+        "displayName": "Tastenwort",
+        "purpose": "Beschriftung der Zähltasten."
+      },
+      "key-hint": {
+        "displayName": "Tastenhinweis",
+        "purpose": "Folge oder Restmenge unter dem Tastenwort."
+      },
+      "foot": {
+        "displayName": "Fuß",
+        "purpose": "Wettbewerb, Runde, Match, Zeit, Distanz, Zustand."
+      }
+    },
+    "shadows": [],
+    "overlays": [
+      {
+        "name": "referee-scrim",
+        "value": "rgb(5 8 13 / 97%)",
+        "purpose": "Schiedsrichtermenü deckt die Tafel fast ganz ab."
+      }
+    ],
+    "motion": [
+      {
+        "name": "sponsor-crossfade",
+        "value": "Überblenden",
+        "purpose": "Sponsorenlogos im Leerlauf blenden über statt umzuschalten."
+      },
+      {
+        "name": "pending-score",
+        "value": "Stand wird blasser nach WIMPERNSCHLAG_MS",
+        "purpose": "Ein Stand, der noch unterwegs ist, wird erst nach einem halben Augenblick blasser."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "portrait",
+        "value": "orientation: portrait",
+        "purpose": "Hochkant: dieselbe Tafel, nur niedriger."
+      }
+    ],
+    "units": "Alle Höhen in dvh, innerhalb von Spalten cqh/cqw; Tasten mindestens 64px."
+  },
+  "components": [
+    {
+      "name": "Plus-Taste",
+      "kind": "button",
+      "refersTo": "key-plus",
+      "description": "Punkt für einen Spieler; Hausakzent als Fläche, Tastaturziffer in der Ecke.",
+      "html": "<div class=\"ds-g\"><button class=\"ds-key ds-key--plus\"><span class=\"ds-key__no\">7</span><b>+</b><small>Szewczyk</small></button></div>",
+      "css": ".ds-g{background:#05080d;padding:24px}.ds-key{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:320px;min-height:72px;padding:6px 10px;border:2px solid #1b2432;border-radius:10px;background:#0b1220;color:#fff;font-family:Montserrat, system-ui, sans-serif;text-transform:uppercase;cursor:pointer;touch-action:manipulation;user-select:none}.ds-key--plus{border-color:#00afee;background:#00afee;color:#00222f}.ds-key b{font-size:30px;font-weight:900;line-height:1}.ds-key small{font-size:14px;font-weight:600;letter-spacing:.04em;opacity:.75}.ds-key__no{position:absolute;top:4px;right:8px;font-size:12px;font-weight:600;opacity:.6}.ds-key:active{filter:brightness(1.12)}.ds-key:focus-visible{outline:3px solid #fff;outline-offset:3px}"
+    },
+    {
+      "name": "Minus- und Neutraltaste",
+      "kind": "button",
+      "refersTo": "key-neutral",
+      "description": "Schmale Minus-Taste gedämpft; neutrale Taste mit Hinweiszeile.",
+      "html": "<div class=\"ds-g\"><button class=\"ds-k ds-k--minus\">–</button><button class=\"ds-k ds-k--wide\"><b>Time out</b><small>2 left</small></button></div>",
+      "css": ".ds-g{background:#05080d;padding:24px;display:flex;gap:10px}.ds-k{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;min-width:72px;border:2px solid #1b2432;border-radius:10px;background:#0b1220;color:#fff;font-family:Montserrat, system-ui, sans-serif;text-transform:uppercase;cursor:pointer;user-select:none}.ds-k--minus{border-color:#93a1b3;color:#93a1b3;font-size:30px;font-weight:700}.ds-k--wide{width:300px}.ds-k b{font-size:26px;font-weight:700;letter-spacing:.04em;line-height:1}.ds-k small{font-size:14px;font-weight:600;letter-spacing:.04em;opacity:.75}.ds-k:hover{border-color:#2c3a4f}.ds-k:focus-visible{outline:3px solid #fff;outline-offset:3px}"
+    },
+    {
+      "name": "Finish-Taste",
+      "kind": "button",
+      "refersTo": "key-finish",
+      "description": "Abschluss; gesperrt blass, bis die Distanz erreicht ist.",
+      "html": "<div class=\"ds-g\"><button class=\"ds-fin\" disabled><b>Finish</b><small>Nobody has reached 9</small></button><button class=\"ds-fin\"><b>Finish</b><small>Szewczyk wins 9–4</small></button></div>",
+      "css": ".ds-g{background:#05080d;padding:24px;display:flex;gap:10px}.ds-fin{display:flex;flex-direction:column;align-items:center;justify-content:center;width:300px;min-height:72px;border:2px solid #33cb81;border-radius:10px;background:#33cb81;color:#04240f;font-family:Montserrat, system-ui, sans-serif;text-transform:uppercase;cursor:pointer}.ds-fin b{font-size:30px;font-weight:900;letter-spacing:.04em;line-height:1}.ds-fin small{font-size:14px;font-weight:600;letter-spacing:.04em;opacity:.75}.ds-fin:disabled{opacity:.4;cursor:not-allowed}.ds-fin:focus-visible{outline:3px solid #fff;outline-offset:3px}"
+    },
+    {
+      "name": "Spielerseite",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Stand als größtes Element, Anstoßbalken, Flagge, Nachname in Versalien, Vorname gedämpft.",
+      "html": "<div class=\"ds-side\"><div class=\"ds-side__score\">6</div><div class=\"ds-side__break\">Break</div><div class=\"ds-side__flag\"></div><div class=\"ds-side__sur\">Szewczyk</div><div class=\"ds-side__given\">Wojciech</div></div>",
+      "css": ".ds-side{width:420px;padding:24px;background:#05080d;color:#fff;font-family:Montserrat, system-ui, sans-serif;font-variant-numeric:tabular-nums}.ds-side__score{font-size:160px;font-weight:900;line-height:.82;letter-spacing:-.03em}.ds-side__break{margin:18px 0 60px;padding:8px;border-radius:4px;background:#00afee;color:#00222f;font-size:24px;font-weight:900;letter-spacing:.3em;text-align:center;text-transform:uppercase}.ds-side__flag{width:72px;height:54px;border-radius:3px;background:linear-gradient(#fff 50%,#dc143c 50%)}.ds-side__sur{margin-top:8px;font-size:52px;font-weight:900;line-height:1.02;text-transform:uppercase}.ds-side__given{font-size:30px;font-weight:600;line-height:1.1;color:#93a1b3}"
+    },
+    {
+      "name": "Mitte mit Tischschild und Disziplinkapsel",
+      "kind": "chip",
+      "refersTo": "discipline-capsule",
+      "description": "Wappen, Tischnummer im Hausakzent, Disziplin als Kapsel mit Akzentrahmen.",
+      "html": "<div class=\"ds-mid\"><div class=\"ds-mid__crest\">EPBF</div><div class=\"ds-mid__table\">T01</div><div class=\"ds-mid__disc\">9-Ball</div></div>",
+      "css": ".ds-mid{display:flex;flex-direction:column;align-items:center;gap:14px;padding:28px;background:#05080d;color:#fff;font-family:Montserrat, system-ui, sans-serif}.ds-mid__crest{font-size:44px;font-weight:900;letter-spacing:.14em}.ds-mid__table{font-size:110px;font-weight:900;letter-spacing:.02em;line-height:1;color:#00afee}.ds-mid__disc{padding:.3em .85em;border:.09em solid #00afee;border-radius:999px;font-size:48px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}"
+    },
+    {
+      "name": "Auszeit-Anzeige",
+      "kind": "chip",
+      "refersTo": "timeout-over",
+      "description": "Rahmen im Akzent; überzogen als rote Fläche.",
+      "html": "<div class=\"ds-g\"><span class=\"ds-to\">Time out</span><span class=\"ds-to ds-to--over\">Time out 0:12</span><span class=\"ds-sc\">Shot clock 0:30</span></div>",
+      "css": ".ds-g{background:#05080d;padding:24px;display:flex;gap:12px;align-items:center}.ds-to{padding:6px 14px;border:.08em solid #00afee;border-radius:4px;color:#00afee;font:800 22px Montserrat, system-ui, sans-serif;letter-spacing:.06em;text-transform:uppercase}.ds-to--over{border-color:#ff5252;background:#ff5252;color:#2b0000}.ds-sc{padding:6px 14px;border-radius:999px;background:rgb(255 197 61 / 16%);color:#ffc53d;font:800 22px Montserrat, system-ui, sans-serif;letter-spacing:.06em;text-transform:uppercase}"
+    },
+    {
+      "name": "Fußzeile",
+      "kind": "nav",
+      "refersTo": "",
+      "description": "Wettbewerb, Runde, Match, Zeit, Distanz, Zustand; Verbindungspunkt rechts.",
+      "html": "<div class=\"ds-foot\"><span class=\"ds-foot__first\">Men 9-Ball Singles</span><i>·</i><span>Quarterfinal</span><i>·</i><span>Match A09</span><i>·</i><span>Race to 9</span><b class=\"ds-foot__dot\"></b></div>",
+      "css": ".ds-foot{display:flex;align-items:center;gap:12px;padding:14px 24px;background:#05080d;color:#93a1b3;font:600 20px Montserrat, system-ui, sans-serif;letter-spacing:.04em;text-transform:uppercase}.ds-foot i{font-style:normal;color:#1b2432}.ds-foot__first{color:#fff;font-weight:700}.ds-foot__dot{margin-left:auto;width:10px;height:10px;border-radius:50%;background:#33cb81}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Aus fünf Metern",
+    "overview": "Die Tafel ist der Bildschirm neben dem Tisch. Spieler, Schiedsrichter und Publikum lesen sie aus fünf Metern, unter Tischlampen und Streulicht, und auf einem freigegebenen Gerät zählt der Schiedsrichter auf ihr. Jede Entscheidung an dieser Oberfläche ist an diesem Abstand bemessen. Der Stand ist das größte Element des Bildes, der Grund ist fast schwarz, die Schrift weiß, und es gibt genau einen Akzent. Dazwischen bleibt Luft, und die ist nicht verschenkt: Sie trennt die Blöcke so weit, dass das Auge zuerst die Zahl findet.\n\nDie Tafel hat keine Schriftgrößen in Pixeln. Alle Höhen sind `dvh` und innerhalb der Spalten Containermaße (`cqh`, `cqw`), damit ein 32-Zoll- und ein 75-Zoll-Bildschirm dasselbe Bild zeigen. Gerechnet ist mit 16:9 quer. Hochkant ist es dieselbe Tafel, nur niedriger.\n\nDie Tafel ist eine Anzeige und kein Dokument. Nichts lässt sich markieren, nichts zoomt beim doppelten Tippen, nichts blitzt grau auf, und die Seite scrollt nicht. Ein langer Druck öffnet das Schiedsrichtermenü. Jede Fehlbedienung lässt sich zurücknehmen, mit „Undo“ für den letzten Eintrag oder im Menü, etwa für eine versehentlich genommene Auszeit.",
+    "keyCharacteristics": [
+      "Fast schwarzer Grund, weiße Schrift, ein Hausakzent",
+      "Der Stand ist das größte Element: Montserrat Black, tabellarische Ziffern",
+      "Versalien mit Sperrung für alles außer dem Vornamen",
+      "Alle Maße in dvh/cqh statt Pixeln, damit jede Bildschirmgröße dasselbe Bild zeigt",
+      "Tasten mindestens 64 px hoch, damit man sie mit Kreide am Finger trifft",
+      "Keine Markierung, kein Zoom, kein Scrollen, kein Tipp-Aufblitzen"
+    ],
+    "rules": [
+      {
+        "name": "Die Hausfarben-Regel",
+        "body": "Der Akzent gehört dem Veranstalter und wechselt je Haus. Alles, was gelesen werden muss (Shot-Clock, Gefahr, Abschluss), hängt dagegen nie davon ab, welches Haus gerade seine Farben gesetzt hat, und hat deshalb feste Werte.",
+        "section": "colors"
+      },
+      {
+        "name": "Die Kein-Grund-Regel",
+        "body": "Die Hausfarbe erscheint als Akzent auf Schwarz, nie als Fläche hinter dem Bild. Eine Marke für weißen Grund wird nicht auf die Tafel übertragen.",
+        "section": "colors"
+      },
+      {
+        "name": "Die dvh-Regel",
+        "body": "Jedes Höhenmaß ist `dvh` und nie `vh`, auch in `min()` und in ausgerechneten Schriftgrößen. Auf iOS Safari ist `vh` größer als das Sichtbare. Am 16.09.2026 lagen deshalb auf dem iPad des Auftraggebers die Namen über der Kugelreihe.",
+        "section": "typography"
+      },
+      {
+        "name": "Die Ziffern-Regel",
+        "body": "`tabular-nums` auf der ganzen Tafel, damit der Stand beim Wechsel von 9 auf 10 nicht springt.",
+        "section": "typography"
+      },
+      {
+        "name": "Bekannte Abweichung",
+        "body": "Geladen sind die Schnitte 600, 700 und 900. Nachname, Tasten und Kapseln verlangen 800, der Vorname 500. Der Browser weicht auf 900 bzw. 600 aus. Die Maße sind gegen das gerenderte Ergebnis vermessen, das Bild stimmt also. Die Angaben im Code sagen aber etwas anderes, als zu sehen ist.",
+        "section": "typography"
+      },
+      {
+        "name": "Die Abdunkeln-statt-Anheben-Regel",
+        "body": "Was darüber liegt, deckt ab. Es schwebt nicht.",
+        "section": "elevation"
+      },
+      {
+        "name": "Offene Lücke",
+        "body": "In bb-score setzt heute keine Datei `--color-primary`. Die Hausfarbendatei (`tenant.css`) lag in epbf-website und kam bei der Trennung nicht mit. Deshalb zeigt jede Tafel die Rückfallfarbe #00afee, gleich welchem Haus sie gehört. Für `--color-success`, `--color-danger` und `--color-warning` gilt dasselbe.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** jedes Maß in `dvh` bzw. Containermaßen (`cqh`, `cqw`) angeben, auch Schriftgrößen. Nie `vh`, nie Pixel, außer als Untergrenze für Tasten (64 px).",
+      "**Do** den Stand als größtes Element setzen und Luft zwischen Stand und Namen lassen.",
+      "**Do** den Hausakzent nur als Akzent auf Schwarz einsetzen und Zustände, die gelesen werden müssen, mit festen Werten.",
+      "**Do** jede Bedienung zurücknehmbar machen und Folgenschweres mit Rückfrage und Folge-Hinweis absichern.",
+      "**Do** auf jeder Tafelseite Markieren, Doppeltipp-Zoom, Tipp-Aufblitzen und Gummiband abschalten (`.board-screen`).",
+      "**Do** neue Maße gegen die geladene Montserrat vermessen, im Querformat 16:9 und im Hochformat."
+    ],
+    "donts": [
+      "**Don't** die Hausfarbe als Fläche hinter das Bild legen.",
+      "**Don't** `--color-warning` des Hauses für die Shot-Clock verwenden. Sie hat ihr eigenes Gelb.",
+      "**Don't** Rot für etwas Neues belegen. Es steht schon für überzogene Auszeit, fehlende Trikotkontrolle, fehlenden Anstoß und Abweisung."
+    ]
+  }
+}
