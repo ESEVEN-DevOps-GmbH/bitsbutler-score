@@ -1,3 +1,10 @@
+## [0.1.3](https://github.com/ESEVEN-DevOps-GmbH/bitsbutler-score/compare/v0.1.2...v0.1.3) (2026-10-09)
+
+
+### Bug Fixes
+
+* Tafel nennt den Tisch, fuer den das Geraet freigegeben ist ([b592bd4](https://github.com/ESEVEN-DevOps-GmbH/bitsbutler-score/commit/b592bd466c3c6caec5a5819cf5b1c7cd0c554340))
+
 ## [0.1.2](https://github.com/ESEVEN-DevOps-GmbH/bitsbutler-score/compare/v0.1.1...v0.1.2) (2026-10-08)
 
 
