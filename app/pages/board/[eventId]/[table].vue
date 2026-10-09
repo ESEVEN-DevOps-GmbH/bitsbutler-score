@@ -1069,6 +1069,12 @@ interface ScoringInfo {
   /** Dieses Gerät hält eine gültige Freigabe für genau diesen Tisch. */
   released: boolean
   mayScore: boolean
+  /**
+   * Der Tisch, für den dieses Gerät freigegeben ist, wenn es nicht dieser
+   * hier ist (gleiche Veranstaltung). Optional, weil ein älterer Server das
+   * Feld nicht schickt — dann fehlt der Hinweis, und sonst nichts.
+   */
+  grantedTable?: number | null
   match: Extra | null
   /**
    * Die Bau-Kennung des Servers, der geantwortet hat.
@@ -1139,8 +1145,34 @@ const canScore = computed(() =>
  * leer, und das ist richtig: das Gerät zählt über seine Freigabe, und die
  * Rechte eines Kontos gehen es nichts an.
  */
+/**
+ * Der Tisch, zu dem dieses Gerät gehört, wenn jemand auf einem ANDEREN steht.
+ *
+ * Das ist der Fall nach der Zurück-Taste des Browsers, nachdem der Tisch per
+ * PIN gewechselt wurde: sie führt auf die Seite des alten Tisches, dort ist
+ * die Tafel nur Anzeige, und der Bediener sieht weder Leiste noch einen Grund. Bewusst KEINE
+ * Weiterleitung: ein stiller Sprung verwirrt mehr als eine Zeile, die sagt,
+ * wo es weitergeht. Mit Recht (`mayScore`) zählt der Fall nicht — dann gibt
+ * es hier nichts zu erklären.
+ */
+const releasedTable = computed<number | null>(() => {
+  const i = info.value
+  if (i === null || i.mayScore) return null
+  return typeof i.grantedTable === 'number' ? i.grantedTable : null
+})
+
 const blockedReason = computed(() => {
   if (info.value === null) return ''
+  /*
+   * VOR dem Konto-Satz, weil er der brauchbarere ist: „dieses Konto darf
+   * nicht zählen" ist eine Sackgasse, „dieses Gerät gehört zu Tisch 3" nennt
+   * den Weg. Beide können zugleich wahr sein (ein Konto ohne Recht an einem
+   * freigeschalteten Gerät) — dann hilft nur der zweite weiter. Der
+   * Konto-Satz bleibt für den Fall, dass keine Freigabe anderswo liegt.
+   */
+  if (releasedTable.value !== null) {
+    return `This device is released for table ${releasedTable.value}.`
+  }
   if (info.value.actingAs === 'PERSON' && !info.value.mayScore) {
     return 'This account may not score at this event.'
   }
@@ -2228,6 +2260,19 @@ useHead({
         weiter und der Saal soll sie sehen —, sondern als eine Zeile, die
         der Turnierleitung sagt, was zu tun ist.
       -->
+      <!--
+        Das Gerät gehört zu einem anderen Tisch: der Hinweis ist selbst die
+        Trefferfläche — am Tablet trifft man eine ganze Zeile, keinen
+        Textlink. Ohne den Satz „press 0 twice": an diesem Gerät ist nichts
+        falsch eingerichtet, es steht nur auf dem falschen Tisch.
+      -->
+      <NuxtLink
+        v-else-if="scoringBlocked && releasedTable !== null"
+        :to="`/board/${encodeURIComponent(eventId)}/${releasedTable}`"
+        class="board__zaehlhinweis board__zaehlhinweis--weiter"
+      >
+        {{ scoringBlocked }} · open table {{ releasedTable }} &rarr;
+      </NuxtLink>
       <p v-else-if="scoringBlocked" class="board__zaehlhinweis">
         {{ scoringBlocked }} · press 0 twice to set this screen up again
       </p>
@@ -2974,6 +3019,16 @@ useHead({
   letter-spacing: 0.04em;
   text-align: center;
   text-transform: uppercase;
+}
+
+.board__zaehlhinweis--weiter {
+  display: block;
+  /* Mindesthöhe für den Finger; die Zeile darüber ist nur Text. */
+  min-height: 6dvh;
+  box-sizing: border-box;
+  align-content: center;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .board__foot {

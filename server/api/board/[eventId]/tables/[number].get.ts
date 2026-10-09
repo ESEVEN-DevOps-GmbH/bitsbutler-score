@@ -220,6 +220,15 @@ export default defineEventHandler(async (event) => {
   let viaGrant = false
   /** Was der Server über den Weg sagt, wenn eine Freigabe anliegt. */
   let wayFromServer: string | null = null
+  /**
+   * Der Tisch, für den dieses Gerät freigegeben ist, wenn es NICHT der
+   * aufgerufene ist (gleiche Veranstaltung). Der Grund ist die Zurück-Taste
+   * nach einem Tischwechsel per PIN: sie führt auf die Seite des alten
+   * Tisches, und dort stand bisher eine Anzeige ohne Leiste und ohne
+   * Erklärung. Es ist nur eine AUSKUNFT und kein Recht — `mayScore` bleibt
+   * `false`, die Seite zeigt deshalb nur den Weg, die Bedienflächen bleiben aus.
+   */
+  let grantedTable: number | null = null
   if (granted) {
     const own = await fromAdmin<{
       eventId: string | null, tableNumber: number | null, via: string | null,
@@ -251,6 +260,14 @@ export default defineEventHandler(async (event) => {
       // Die Zeile des Angemeldeten hat Vorrang: sie ist dieselbe Auskunft
       // aus derselben Sicht, und wer sie bekommen hat, soll sie behalten.
       rowRec = rowRec ?? own.match
+    }
+
+    // Die Antwort von oben wird nur ausgewertet, es geht keine weitere
+    // Anfrage an die Verwaltung. Eine Freigabe für eine ANDERE Veranstaltung
+    // sagt über diese Tafel nichts und bleibt deshalb außen vor.
+    if (own && own.eventId === eventId
+      && own.tableNumber !== null && own.tableNumber !== tableNumber) {
+      grantedTable = own.tableNumber
     }
   }
 
@@ -326,6 +343,7 @@ export default defineEventHandler(async (event) => {
       actingAs,
       released: false,
       mayScore: false,
+      grantedTable,
       match: null,
       buildId,
     }
@@ -375,6 +393,9 @@ export default defineEventHandler(async (event) => {
      * ehrlichere Auskunft als ein Knopf, der fehlt.
      */
     mayScore: true,
+    // Auch hier mitgeschickt, damit beide Antworten dieselbe Form haben; die
+    // Seite zeigt den Hinweis nur, wo `mayScore` falsch ist.
+    grantedTable,
     match: rowRec === null
       ? null
       : {
